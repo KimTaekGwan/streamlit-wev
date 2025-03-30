@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 메인 앱에서 함수 가져오기
-from apps.test.main import load_areas, save_areas, check_login
+from main import load_areas, save_areas, check_login
 
 # 페이지 설정
 st.set_page_config(
