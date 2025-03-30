@@ -9,7 +9,12 @@ import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 메인 앱에서 함수 가져오기
-from main import load_assignments, export_assignment_to_excel, check_login
+from main import (
+    load_assignments,
+    export_assignment_to_excel,
+    check_login,
+    save_assignments,
+)
 from streamlit.components.v1 import html
 
 # 페이지 설정
@@ -203,7 +208,7 @@ def main():
             excel_data = export_assignment_to_excel(filtered_df)
             file_name = f"청소구역배치_{selected_date.replace('-', '').replace(' ', '_').replace(':', '')}.xlsx"
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 st.download_button(
                     label="엑셀 파일로 다운로드",
@@ -211,6 +216,24 @@ def main():
                     file_name=file_name,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 )
+
+            with col3:
+                # 배치 기록 삭제 버튼
+                if st.button(
+                    "이 배치 기록 삭제", type="primary", use_container_width=True
+                ):
+                    delete_confirm = st.checkbox(
+                        "정말로 이 배치 기록을 삭제하시겠습니까?"
+                    )
+
+                    if delete_confirm:
+                        # 선택된 날짜의 배치 기록을 제외한 나머지 기록만 유지
+                        assignments_df = assignments_df[
+                            assignments_df["날짜"] != selected_date
+                        ]
+                        save_assignments(assignments_df)
+                        st.success(f"{selected_date} 배치 기록이 삭제되었습니다.")
+                        st.rerun()
 
             # 템플릿 문자열 생성 및 복사 기능
             template_text = generate_template_text(selected_date, grouped)
